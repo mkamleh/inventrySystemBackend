@@ -17,10 +17,10 @@ import { EventModule } from './event/event.module';
   imports: [
     TypeOrmModule.forRoot({
       type: 'mysql',
-      host: '127.0.0.1',
+      host: 'db',
       port: 3306,
       username: 'root',
-      password: 'Mkamleh1324@',
+      password: 'Aa12345678!',
       database: 'test',
       autoLoadEntities: true,
       synchronize: true,
