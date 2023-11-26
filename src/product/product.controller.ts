@@ -26,11 +26,6 @@ export class ProductController {
     return this.productService.findAll(query);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.productService.findOne(+id);
-  }
-
   @Patch('')
   update(@Body() updateProductDto: UpdateProductDto) {
     return this.productService.update(updateProductDto);

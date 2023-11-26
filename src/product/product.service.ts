@@ -5,31 +5,33 @@ import { Product } from './entities/product.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { FilterOperator, PaginateQuery, paginate } from 'nestjs-paginate';
+import { EventGateway } from 'src/event/event.gateway';
 
 @Injectable()
 export class ProductService {
   constructor(
     @InjectRepository(Product) private productRepository: Repository<Product>,
+    private gatewate: EventGateway,
   ) {}
-  create(createProductDto: CreateProductDto) {
-    this.productRepository.save(createProductDto);
-    return 'This action adds a new product';
+  defaultPaginfation: PaginateQuery = { page: 1, path: 'null' };
+
+  async create(createProductDto: CreateProductDto) {
+    await this.productRepository.save(createProductDto);
+    return this.findAll(this.defaultPaginfation);
   }
 
-  findAll(query: PaginateQuery) {
-    return paginate(query, this.productRepository, {
+  async findAll(query?: PaginateQuery) {
+    const data = await paginate(query, this.productRepository, {
       sortableColumns: ['stock'],
-      searchableColumns: ['name', 'category'],
+      searchableColumns: ['name', 'category', 'price'],
       filterableColumns: {
         name: [FilterOperator.SW],
         category: [FilterOperator.SW],
         price: [FilterOperator.BTW],
       },
     });
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} product`;
+    this.gatewate.sendMessage(data);
+    return data;
   }
 
   async update(updateProductDto: UpdateProductDto) {
@@ -39,7 +41,8 @@ export class ProductService {
     if (!product) {
       throw new HttpException('NOT FOUND', HttpStatus.NOT_FOUND);
     }
-    return this.productRepository.update(updateProductDto.id, updateProductDto);
+    await this.productRepository.update(updateProductDto.id, updateProductDto);
+    return this.findAll(this.defaultPaginfation);
   }
 
   async remove(id: number) {
@@ -47,6 +50,6 @@ export class ProductService {
     if (!updatedResult.affected) {
       throw new HttpException('NOT FOUND', HttpStatus.NOT_FOUND);
     }
-    return updatedResult;
+    return this.findAll(this.defaultPaginfation);
   }
 }

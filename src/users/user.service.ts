@@ -8,15 +8,21 @@ export class UsersService {
   private readonly users = [
     {
       userId: 1,
-      username: 'john',
-      password: 'changeme',
-      roles: [Role.User],
+      username: 'manager@manager.com',
+      password: '12345678',
+      roles: [Role.Manager],
     },
     {
       userId: 2,
-      username: 'maria',
-      password: 'guess',
-      roles: [Role.Admin, Role.User],
+      username: 'admin@admin.com',
+      password: '12345678',
+      roles: [Role.Admin, Role.Manager],
+    },
+    {
+      userId: 3,
+      username: 'user@user.com',
+      password: '12345678',
+      roles: [Role.User],
     },
   ];
 

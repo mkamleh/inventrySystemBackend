@@ -11,6 +11,7 @@ import { UsersService } from './users/user.service';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './auth/auth.guard';
 import { RolesGuard } from './auth/roles.guard';
+import { EventModule } from './event/event.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { RolesGuard } from './auth/roles.guard';
     ProductModule,
     TransactionsModule,
     AuthModule,
+    EventModule,
   ],
   controllers: [AppController],
   providers: [

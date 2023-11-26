@@ -4,6 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
 import { Transaction } from './entities/transaction.entity';
 import { Product } from 'src/product/entities/product.entity';
+import { ProductService } from 'src/product/product.service';
 
 @Injectable()
 export class TransactionsService {
@@ -11,6 +12,7 @@ export class TransactionsService {
     @InjectRepository(Transaction)
     private transactionRepository: Repository<Transaction>,
     private dataSource: DataSource,
+    private productService: ProductService,
   ) {}
   async create(createTransactionDto: CreateTransactionDto) {
     const queryRunner = this.dataSource.createQueryRunner();
@@ -52,6 +54,7 @@ export class TransactionsService {
       }
 
       await queryRunner.commitTransaction();
+      this.productService.findAll({ page: 1, path: 'null' });
     } catch (err) {
       await queryRunner.rollbackTransaction();
       throw new HttpException(err, HttpStatus.BAD_REQUEST);
