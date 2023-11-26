@@ -6,5 +6,6 @@ export class CreateTransactionDto {
   @IsNumber()
   amount: number;
   @IsNotEmpty()
-  products: Product[];
+  products: (Product & { quantity: number })[];
+  totalItems: number;
 }

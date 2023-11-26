@@ -17,6 +17,7 @@ export class TransactionsService {
   async create(createTransactionDto: CreateTransactionDto) {
     const queryRunner = this.dataSource.createQueryRunner();
     let total = 0;
+    let totalItems = 0;
 
     await queryRunner.connect();
     await queryRunner.startTransaction();
@@ -29,19 +30,22 @@ export class TransactionsService {
           .setLock('pessimistic_write')
           .where('id = :id', { id: prodcut.id })
           .getOne();
-        if (!currentProduct || currentProduct.stock < prodcut.stock) {
+        if (!currentProduct || currentProduct.stock < prodcut.quantity) {
           throw new HttpException(
             `${currentProduct.name} is deleted or qunatity is bigger than stock`,
             HttpStatus.BAD_REQUEST,
           );
         }
-        total += currentProduct.price * prodcut.stock;
+        total += currentProduct.price * prodcut.quantity;
+        totalItems += prodcut.quantity;
 
         await queryRunner.manager
           .getRepository(Product)
           .createQueryBuilder('test')
           .update()
-          .set({ stock: Number(currentProduct.stock) - Number(prodcut.stock) })
+          .set({
+            stock: Number(currentProduct.stock) - Number(prodcut.quantity),
+          })
           .where('id = :id', { id: prodcut.id })
           .execute();
       }
@@ -52,7 +56,7 @@ export class TransactionsService {
           HttpStatus.BAD_REQUEST,
         );
       }
-
+      createTransactionDto.totalItems = totalItems;
       await queryRunner.commitTransaction();
       this.productService.findAll({ page: 1, path: 'null' });
     } catch (err) {

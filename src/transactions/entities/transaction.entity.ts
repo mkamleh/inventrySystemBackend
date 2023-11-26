@@ -15,12 +15,17 @@ export class Transaction {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToMany(() => Product)
+  @ManyToMany(() => Product, {
+    cascade: ['insert', 'update'],
+  })
   @JoinTable()
   products: Product[];
 
   @Column()
   amount: number;
+
+  @Column()
+  totalItems: number;
 
   @CreateDateColumn()
   createdAt: Date; // Creation date
